@@ -1,6 +1,6 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -8,42 +8,52 @@ from eralchemy import render_er
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = 'user'
     # Here we define columns for the table person
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), unique=True, nullable=False)
-    password = Column(String(50), nullable=False, )
+    name = Column(String(250), nullable=False)
+    password = Column(String(50), nullable=False)
+    email = Column(String(100), nullable= False)
+    user_name = Column(String(100), unique = True, nullable=False)
+    coments = relationship(
+        "coment", backref="users")
+    posts = relationship("post", backref="user")
+    followers = relationship("follower", backref="follower")
 
-class Character(Base):
-    __tablename__ = 'Character'
+class Coment(Base):
+    __tablename__ = 'coment'
     # Here we define columns for the table Characters.
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    name = Column(String(250))
-    hair_colour = Column(String(250))
-    eye_colour = Column(String(250))
-    planet_id = Column(Integer, ForeignKey('Planet.id'))
-
-class Planet(Base):
-    __tablename__ = 'Planet'
-    # Here we define columns for the table Characters.
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250))
-    population = Column(Integer)
-    density = Column(Integer)
-
-
-class Favorites(Base):
-    __tablename__ = 'Favorites'
-    # Here we define columns for the table Characters.
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
+    date = Column(DateTime, nullable=False)
+    body = Column( String(300))
     user_id = Column(Integer, ForeignKey('user.id'))
-    planet_id = Column(Integer, ForeignKey('Planet.id'))
-    character_id = Column(Integer, ForeignKey('Character.id'))
+    post_id = Column(Integer, ForeignKey('post.id'))
+
+
+    
+
+class Post(Base):
+    __tablename__ = 'post'
+    # Here we define columns for the table Characters.
+    # Notice that each column is also a normal Python instance attribute.
+    id = Column(Integer, primary_key=True)
+    title = Column (String(200), nullable=False)
+    location = Column (String, nullable=True)
+    date = Column(DateTime, nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    coments = relationship(
+        "coment", backref="post")
+
+class Follower(Base):
+    __tablename__="follower"
+    id= Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+
+    
 
     def to_dict(self):
         return {}
